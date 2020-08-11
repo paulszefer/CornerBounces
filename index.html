@@ -1,0 +1,95 @@
+<canvas id='canvas'></canvas>
+<h1 style='font-family: Verdana light'>The corner has been hit <span id='cornerCount'></span> times</h1>
+<script>
+  let TPS = 120;
+
+  let WIDTH = 400;
+  let HEIGHT = 400;
+
+  let borderColor = "#000000";
+  let backgroundColor = "#101050";
+  let markingColor = "#FFFFFF";
+  let ballColor = "#66FF77";
+
+  let canvas = document.getElementById('canvas');
+  canvas.width = WIDTH;
+  canvas.height = HEIGHT;
+
+  let context = canvas.getContext('2d');
+
+  let lineDashArray = [HEIGHT / 25, HEIGHT / 50];
+
+  let ballRadius = 8;
+  let halfBallRadius = ballRadius / 2;
+  let ballX;
+  let ballY;
+  let ballSpeed;
+  let ballDX;
+  let ballDY;
+
+  let cornerCountSpan = document.getElementById('cornerCount');
+
+  function getRandom(maxDifference, minDifference) {
+    return maxDifference * (Math.random() * 2 - 1);
+  }
+
+  function init() {
+    ballX = WIDTH / 2;
+    ballY = HEIGHT / 2;
+    ballSpeed = 0.1;
+    ballDX = getRandom(1, 0.5);
+    ballDY = getRandom(1, 0);
+  }
+
+  function getCornerCount() {
+    return 0; // lol
+  }
+
+  function tick() {
+    ballX += ballDX * ballSpeed;
+    ballY += ballDY * ballSpeed;
+
+    if (ballX - halfBallRadius <= 0 || ballX + halfBallRadius >= WIDTH) {
+      ballDX *= -1;
+    }
+    if (ballY - halfBallRadius <= 0 || ballY + halfBallRadius >= HEIGHT) {
+      ballDY *= -1;
+    }
+
+    ballSpeed += TPS / 60 * 0.001;
+
+    // ballDX += getRandom(0.01);
+    // ballDY += getRandom(0.01);
+
+    cornerCountSpan.innerText = getCornerCount();
+  }
+
+  function render() {
+    context.fillStyle = backgroundColor;
+    context.fillRect(0, 0, WIDTH, HEIGHT);
+
+    context.strokeStyle = borderColor;
+    context.strokeRect(0, 0, WIDTH, HEIGHT);
+
+    context.strokeStyle = markingColor;
+    context.setLineDash(lineDashArray);
+    context.beginPath();
+    context.moveTo(WIDTH / 2, 0);
+    context.lineTo(WIDTH / 2, HEIGHT);
+    context.stroke();
+
+    context.fillStyle = ballColor;
+    context.beginPath();
+    context.arc(ballX, ballY, ballRadius, 0, 2 * Math.PI);
+    context.fill();
+  }
+
+  function tickUpdate() {
+    tick();
+    render();
+  }
+
+  init();
+
+  let intervalID = setInterval(tickUpdate, TPS / 60);
+</script>
